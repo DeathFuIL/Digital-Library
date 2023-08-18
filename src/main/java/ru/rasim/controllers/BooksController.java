@@ -35,7 +35,7 @@ public class BooksController {
     }
 
     @GetMapping("/new")
-    public String newPerson(@ModelAttribute("book") Book book) {
+    public String newBook(@ModelAttribute("book") Book book) {
         return "book/new";
     }
 
