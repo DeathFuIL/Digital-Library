@@ -24,7 +24,7 @@ public class BookingsController {
 
     @GetMapping()
     public String showAll(Model model) {
-        model.addAttribute("booking", bookingsRepository.showAll());
+        model.addAttribute("bookings", bookingsRepository.showAll());
 
         return "booking/showAll";
     }
@@ -35,6 +35,21 @@ public class BookingsController {
 
         return "booking/show";
     }
+
+    @GetMapping("/active")
+    public String showAllActive(Model model) {
+        model.addAttribute("activeBookings", bookingsRepository.showAllActive());
+
+        return "booking/active";
+    }
+
+    @GetMapping("/finished")
+    public String showAllFinished(Model model) {
+        model.addAttribute("finishedBookings", bookingsRepository.showAllFinished());
+
+        return "booking/finished";
+    }
+
 
     @GetMapping("/new")
     public String newBooking(@ModelAttribute("booking")Booking booking) {
@@ -51,22 +66,6 @@ public class BookingsController {
         return "redirect:/bookings";
     }
 
-    @GetMapping("/{id}/edit")
-    public String edit(@PathVariable("id") Integer id, Model model) {
-        model.addAttribute("booking", bookingsRepository.show(id));
-
-        return "booking/edit";
-    }
-
-    @PatchMapping("/{id}")
-    public String update(@ModelAttribute("booking") @Valid Booking booking, BindingResult bindingResult,
-                         @PathVariable("id") int id) {
-        if (bindingResult.hasErrors())
-            return "booking/edit";
-
-        bookingsRepository.update(id, booking);
-        return "redirect:/bookings";
-    }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {
@@ -74,4 +73,9 @@ public class BookingsController {
         return "redirect:/bookings";
     }
 
+    @PatchMapping("/{id}")
+    public String finish(@ModelAttribute("booking") Booking booking, @PathVariable("id") int id) {
+        bookingsRepository.finish(id, booking);
+        return "redirect:/bookings";
+    }
 }
