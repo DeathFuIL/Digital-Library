@@ -16,6 +16,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring6.view.ThymeleafViewResolver;
+import ru.rasim.models.Book;
+import ru.rasim.repositories.impl.BookingsRepositoryImpl;
+import ru.rasim.repositories.impl.BooksRepositoryImpl;
+import ru.rasim.repositories.impl.PersonsRepositoryImpl;
 
 import javax.sql.DataSource;
 
@@ -33,6 +37,7 @@ public class Config implements WebMvcConfigurer {
         this.applicationContext = applicationContext;
         this.environment = environment;
     }
+
 
     @Bean
     public SpringResourceTemplateResolver templateResolver() {
