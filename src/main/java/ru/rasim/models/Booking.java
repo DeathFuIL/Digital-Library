@@ -14,9 +14,9 @@ public class Booking {
 
     private Integer id;
 
-    private final Integer personId;
+    private final Person person;
 
-    private final Integer bookId;
+    private final Book book;
 
     private final Date timeOfBooking;
 
