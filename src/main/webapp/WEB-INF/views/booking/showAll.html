@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All bookings</title>
+</head>
+<body>
+<a th:href="@{/}">Start menu</a>
+<hr>
+Bookings:
+<div th:each="booking : ${bookings}">
+    <a th:href="@{/boookings/{id}(id=${booking.getId()})}" th:text="${booking.getPerson().getFullName() + '-' + booking.getBook().getFullName()}">booking</a>
+</div>
+</body>
+</html>

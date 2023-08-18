@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking</title>
+</head>
+<body>
+    <a th:href="@{/}">Start menu</a>
+    <br>
+    <a th:href="@{/bookings}">Back</a>
+    <hr>
+    <a th:href="@{person/{id}(id=${booking.getPerson().getId()})}" th:text="${'Person: ' + booking.getPerson().getFullName()}">person</a>
+    <a th:href="@{books/{id}(id=${booking.getBook().getId()})}" th:text="${'Book: ' + booking.getBook().getFullName()}">book</a>
+    <div th:switch="${booking.isFinished()}">
+        <p th:case="${true}">Status: finished</p>
+        <p th:case="${false}">Status: active</p>
+    </div>
+    <form th:method="PATCH" th:action="@{/bookings/{id}(id=${booking.getId()})}" th:object="${booking}">
+        <input type="submit" value="Finish"/>
+    </form>
+    <form th:method="DELETE" th:action="@{/bookings/{id}(id=${booking.getId()})}">
+        <input type="submit" value="Delete"/>
+    </form>
+</body>
+</html>

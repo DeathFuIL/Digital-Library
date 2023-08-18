@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Finished bookings</title>
+</head>
+<body>
+<a th:href="@{/}">Start menu</a>
+<br>
+<a th:href="@{/bookings}">Back</a>
+<hr>
+Finished bookings:
+<div th:each="finishedBooking : ${finishedBookings}">
+    <a th:href="@{/boookings/{id}(id=${finishedBooking.getId()})}" th:text="${finishedBooking.getPerson().getFullName() + '-' + finishedBooking.getBook().getFullName()}">finishedBooking</a>
+</div>
+</body>
+</html>
