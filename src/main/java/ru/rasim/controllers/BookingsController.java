@@ -37,7 +37,7 @@ public class BookingsController {
     }
 
     @GetMapping("/new")
-    public String newPerson(@ModelAttribute("booking")Booking booking) {
+    public String newBooking(@ModelAttribute("booking")Booking booking) {
         return "booking/new";
     }
 
