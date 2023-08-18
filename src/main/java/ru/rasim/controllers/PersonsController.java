@@ -5,11 +5,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.rasim.models.Booking;
 import ru.rasim.models.Person;
 import ru.rasim.repositories.impl.BookingsRepositoryImpl;
 import ru.rasim.repositories.impl.PersonsRepositoryImpl;
 
 import javax.validation.Valid;
+import java.util.List;
+
 
 
 @Controller
@@ -78,7 +81,8 @@ public class PersonsController {
 
     @GetMapping("/{id}/bookings")
     public String getPersonBookings(@PathVariable("id") Integer id, Model model) {
-        model.addAttribute("booking", bookingsRepository.showByPersonId(id));
+        List<Booking> personBookings = bookingsRepository.showByPersonId(id);
+        model.addAttribute("personBookings", personBookings);
 
         return "person/bookings";
     }
