@@ -18,6 +18,9 @@ public class Booking {
 
     private final Book book;
 
-    private final Date timeOfBooking;
+    private Date startTimeOfBooking;
 
+    private Date finishTimeOfBooking;
+
+    private boolean isFinished;
 }
