@@ -27,17 +27,23 @@ public class BookingsRepositoryImpl implements BookingsRepository {
 
     private static final String SQL_DELETE = "DELETE FROM Booking WHERE id = ?";
 
+    private BooksRepositoryImpl booksRepository;
+
+    private PersonsRepositoryImpl personsRepository;
+
     private final JdbcTemplate jdbcTemplate;
 
-    private static final RowMapper<Booking> toBooking = (row, column) -> Booking.builder()
-            .bookId(row.getInt("book_id"))
-            .personId(row.getInt("person_id"))
+    private final RowMapper<Booking> toBooking = (row, column) -> Booking.builder()
+            .book(booksRepository.show(row.getInt("book_id")))
+            .person(personsRepository.show(row.getInt("person_id")))
             .timeOfBooking(row.getDate("time_of_booking"))
             .build();
 
     @Autowired
-    public BookingsRepositoryImpl(JdbcTemplate jdbcTemplate) {
+    public BookingsRepositoryImpl(JdbcTemplate jdbcTemplate, BooksRepositoryImpl booksRepository, PersonsRepositoryImpl personsRepository) {
         this.jdbcTemplate = jdbcTemplate;
+        this.booksRepository = booksRepository;
+        this.personsRepository = personsRepository;
     }
 
     @Override
@@ -47,7 +53,7 @@ public class BookingsRepositoryImpl implements BookingsRepository {
 
     @Override
     public boolean save(Booking booking) {
-        int result = jdbcTemplate.update(SQL_INSERT, booking.getBookId(), booking.getPersonId(), booking.getTimeOfBooking());
+        int result = jdbcTemplate.update(SQL_INSERT, booking.getBook().getId(), booking.getPerson().getId(), booking.getTimeOfBooking());
 
         return result == 1;
     }
@@ -63,7 +69,7 @@ public class BookingsRepositoryImpl implements BookingsRepository {
 
     @Override
     public boolean update(Integer id, Booking updatedBooking) {
-        int result = jdbcTemplate.update(SQL_UPDATE, updatedBooking.getBookId(), updatedBooking.getPersonId(), updatedBooking.getTimeOfBooking(), updatedBooking.getId());
+        int result = jdbcTemplate.update(SQL_UPDATE, updatedBooking.getBook().getId(), updatedBooking.getPerson().getId(), updatedBooking.getTimeOfBooking(), updatedBooking.getId());
 
         return result == 1;
     }
