@@ -9,8 +9,6 @@ import ru.rasim.models.Booking;
 import ru.rasim.repositories.BookingsRepository;
 
 import java.sql.Date;
-import java.sql.Time;
-import java.time.LocalDate;
 import java.util.List;
 
 
