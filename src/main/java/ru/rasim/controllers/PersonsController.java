@@ -38,6 +38,8 @@ public class PersonsController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") Integer id, Model model) {
+        List<Booking> personBookings = bookingsRepository.showByPersonId(id);
+        model.addAttribute("personBookings", personBookings);
         model.addAttribute("person", personsRepository.show(id));
         return "person/show";
     }
@@ -77,13 +79,5 @@ public class PersonsController {
     public String delete(@PathVariable("id") int id) {
         personsRepository.delete(id);
         return "redirect:/persons";
-    }
-
-    @GetMapping("/{id}/bookings")
-    public String getPersonBookings(@PathVariable("id") Integer id, Model model) {
-        List<Booking> personBookings = bookingsRepository.showByPersonId(id);
-        model.addAttribute("personBookings", personBookings);
-
-        return "person/bookings";
     }
 }
