@@ -25,4 +25,8 @@ public class Book {
     @NotEmpty(message = "Author must not be empty")
     private String author;
 
+    public String getFullName() {
+        return name + ", " + author + ", " + year;
+    }
+
 }
