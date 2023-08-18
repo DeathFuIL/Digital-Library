@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import ru.rasim.models.Booking;
 import ru.rasim.repositories.BookingsRepository;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -15,15 +18,19 @@ import java.util.List;
 @Scope("singleton")
 public class BookingsRepositoryImpl implements BookingsRepository {
 
-    private static final String SQL_INSERT = "INSERT INTO Booking(book_id, person_id, time_of_booking) VALUES(?, ?, ?)";
+    private static final String SQL_INSERT = "INSERT INTO Booking(book_id, person_id, start_time_of_booking, is_finished) VALUES(?, ?, ?, ?)";
 
     private static final String SQL_SELECT_ALL = "SELECT * FROM Booking";
+
+    private static final String SQL_SELECT_ALL_ACTIVE = "SELECT * FROM Booking WHERE is_finished = false";
+
+    private static final String SQL_SELECT_ALL_FINISHED = "SELECT * FROM Booking WHERE is_finished = true";
 
     private static final String SQL_SELECT = "SELECT * FROM Booking WHERE id = ?";
 
     private static final String SQL_SELECT_BY_PERSON_ID = "SELECT * FROM Booking WHERE person_id = ?";
 
-    private static final String SQL_UPDATE = "UPDATE Booking SET book_id = ?, person_id = ?, time_of_booking = ? WHERE id = ?";
+    private static final String SQL_UPDATE = "UPDATE Booking SET book_id = ?, person_id = ?, start_time_of_booking = ?, finish_time_of_booking = ?, is_finished = ? WHERE id = ?";
 
     private static final String SQL_DELETE = "DELETE FROM Booking WHERE id = ?";
 
@@ -36,7 +43,9 @@ public class BookingsRepositoryImpl implements BookingsRepository {
     private final RowMapper<Booking> toBooking = (row, column) -> Booking.builder()
             .book(booksRepository.show(row.getInt("book_id")))
             .person(personsRepository.show(row.getInt("person_id")))
-            .timeOfBooking(row.getDate("time_of_booking"))
+            .startTimeOfBooking(row.getDate("start_time_of_booking"))
+            .finishTimeOfBooking(row.getDate("finish_time_of_booking"))
+            .isFinished(row.getBoolean("is_finished"))
             .build();
 
     @Autowired
@@ -53,7 +62,7 @@ public class BookingsRepositoryImpl implements BookingsRepository {
 
     @Override
     public boolean save(Booking booking) {
-        int result = jdbcTemplate.update(SQL_INSERT, booking.getBook().getId(), booking.getPerson().getId(), booking.getTimeOfBooking());
+        int result = jdbcTemplate.update(SQL_INSERT, booking.getBook().getId(), booking.getPerson().getId(), new Date(System.currentTimeMillis()), false);
 
         return result == 1;
     }
@@ -69,7 +78,7 @@ public class BookingsRepositoryImpl implements BookingsRepository {
 
     @Override
     public boolean update(Integer id, Booking updatedBooking) {
-        int result = jdbcTemplate.update(SQL_UPDATE, updatedBooking.getBook().getId(), updatedBooking.getPerson().getId(), updatedBooking.getTimeOfBooking(), updatedBooking.getId());
+        int result = jdbcTemplate.update(SQL_UPDATE, updatedBooking.getBook().getId(), updatedBooking.getPerson().getId(), updatedBooking.getStartTimeOfBooking(), updatedBooking.getFinishTimeOfBooking(), updatedBooking.isFinished() ,updatedBooking.getId());
 
         return result == 1;
     }
@@ -80,4 +89,21 @@ public class BookingsRepositoryImpl implements BookingsRepository {
 
         return result == 1;
     }
+
+    public boolean finish(Integer id, Booking booking) {
+        booking.setFinished(true);
+        booking.setFinishTimeOfBooking(new Date(System.currentTimeMillis()));
+        boolean result = update(id, booking);
+
+        return result;
+    }
+
+    public List<Booking> showAllFinished() {
+        return jdbcTemplate.query(SQL_SELECT_ALL_FINISHED, toBooking);
+    }
+
+    public List<Booking> showAllActive() {
+        return jdbcTemplate.query(SQL_SELECT_ALL_ACTIVE, toBooking);
+    }
+
 }
