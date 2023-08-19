@@ -6,10 +6,14 @@
 </head>
 <body>
 <a th:href="@{/}">Start menu</a>
+<br>
+<a th:href="@{/bookings/active}">Active</a>
+
+<a th:href="@{/bookings/finished}">Finished</a>
 <hr>
 Bookings:
 <div th:each="booking : ${bookings}">
-    <a th:href="@{/boookings/{id}(id=${booking.getId()})}" th:text="${booking.getPerson().getFullName() + '-' + booking.getBook().getFullName()}">booking</a>
+    <a th:href="@{/bookings/{id}(id=${booking.getId()})}" th:text="${booking.getPerson().getFullName() + ' - ' + booking.getBook().getFullName()}">booking</a>
 </div>
 </body>
 </html>
