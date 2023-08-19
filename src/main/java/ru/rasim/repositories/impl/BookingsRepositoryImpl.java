@@ -26,7 +26,7 @@ public class BookingsRepositoryImpl implements BookingsRepository {
 
     private static final String SQL_SELECT = "SELECT * FROM Booking WHERE id = ?";
 
-    private static final String SQL_SELECT_BY_PERSON_ID = "SELECT * FROM Booking WHERE person_id = ?";
+    private static final String SQL_SELECT_BY_PERSON_ID = "SELECT * FROM Booking WHERE person_id = ? AND is_finished = false";
 
     private static final String SQL_UPDATE = "UPDATE Booking SET book_id = ?, person_id = ?, start_time_of_booking = ?, finish_time_of_booking = ?, is_finished = ? WHERE id = ?";
 
@@ -39,6 +39,7 @@ public class BookingsRepositoryImpl implements BookingsRepository {
     private final JdbcTemplate jdbcTemplate;
 
     private final RowMapper<Booking> toBooking = (row, column) -> Booking.builder()
+            .id(row.getInt("id"))
             .book(booksRepository.show(row.getInt("book_id")))
             .person(personsRepository.show(row.getInt("person_id")))
             .startTimeOfBooking(row.getDate("start_time_of_booking"))
@@ -88,7 +89,8 @@ public class BookingsRepositoryImpl implements BookingsRepository {
         return result == 1;
     }
 
-    public boolean finish(Integer id, Booking booking) {
+    public boolean finish(Integer id) {
+        Booking booking = show(id);
         booking.setFinished(true);
         booking.setFinishTimeOfBooking(new Date(System.currentTimeMillis()));
         boolean result = update(id, booking);
