@@ -11,7 +11,7 @@
 <hr>
 Finished bookings:
 <div th:each="finishedBooking : ${finishedBookings}">
-    <a th:href="@{/boookings/{id}(id=${finishedBooking.getId()})}" th:text="${finishedBooking.getPerson().getFullName() + '-' + finishedBooking.getBook().getFullName()}">finishedBooking</a>
+    <a th:href="@{/bookings/{id}(id=${finishedBooking.getId()})}" th:text="${finishedBooking.getPerson().getFullName() + '-' + finishedBooking.getBook().getFullName()}">finishedBooking</a>
 </div>
 </body>
 </html>
