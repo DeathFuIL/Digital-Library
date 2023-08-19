@@ -11,7 +11,9 @@
 <br>
 <p th:text="${book.getName() + ', ' + book.getYear()}">VALUE</p>
 <p th:text="${'Author: ' + book.getAuthor()}">VALUE</p>
-<a th:href="@{/books/{id}/edit(id=${book.getId()})}">Edit</a>
+<form th:method="GET" th:action="@{/books/{id}/edit(id=${book.getId()})}">
+    <input type="submit" value="Edit"/>
+</form>
 <form th:method="DELETE" th:action="@{/books/{id}(id=${book.getId()})}">
     <input type="submit" value="Delete"/>
 </form>
