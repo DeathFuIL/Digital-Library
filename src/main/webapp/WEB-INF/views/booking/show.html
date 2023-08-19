@@ -9,15 +9,26 @@
     <br>
     <a th:href="@{/bookings}">Back</a>
     <hr>
-    <a th:href="@{person/{id}(id=${booking.getPerson().getId()})}" th:text="${'Person: ' + booking.getPerson().getFullName()}">person</a>
-    <a th:href="@{books/{id}(id=${booking.getBook().getId()})}" th:text="${'Book: ' + booking.getBook().getFullName()}">book</a>
+    Person:
+    <a th:href="@{/persons/{id}(id=${booking.getPerson().getId()})}" th:text="${booking.getPerson().getFullName()}">person</a>
+    <br>
+    Book:
+    <a th:href="@{/books/{id}(id=${booking.getBook().getId()})}" th:text="${booking.getBook().getFullName()}">book</a>
     <div th:switch="${booking.isFinished()}">
-        <p th:case="${true}">Status: finished</p>
-        <p th:case="${false}">Status: active</p>
+        <div th:case="${true}">
+            <a th:text="${'Date: ' + booking.getStartTimeOfBooking() + ' - ' + booking.getFinishTimeOfBooking()}"></a>
+            <br>
+            Status: finished
+        </div>
+        <div th:case="${false}">
+            <a th:text="${'Date: ' + booking.getStartTimeOfBooking() + ' - '}"></a>
+            <br>
+            Status: active
+            <form th:method="PATCH" th:action="@{/bookings/{id}(id=${booking.getId()})}" th:object="${booking}">
+                <input type="submit" value="Finish"/>
+            </form>
+        </div>
     </div>
-    <form th:method="PATCH" th:action="@{/bookings/{id}(id=${booking.getId()})}" th:object="${booking}">
-        <input type="submit" value="Finish"/>
-    </form>
     <form th:method="DELETE" th:action="@{/bookings/{id}(id=${booking.getId()})}">
         <input type="submit" value="Delete"/>
     </form>
