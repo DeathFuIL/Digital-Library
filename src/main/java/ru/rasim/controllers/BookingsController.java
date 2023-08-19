@@ -74,8 +74,8 @@ public class BookingsController {
     }
 
     @PatchMapping("/{id}")
-    public String finish(@ModelAttribute("booking") Booking booking, @PathVariable("id") int id) {
-        bookingsRepository.finish(id, booking);
-        return "redirect:/bookings";
+    public String finish(@PathVariable("id") int id) {
+        bookingsRepository.finish(id);
+        return "redirect:/bookings/" + id;
     }
 }
