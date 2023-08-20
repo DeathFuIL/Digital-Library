@@ -32,26 +32,21 @@ public class BookingsRepositoryImpl implements BookingsRepository {
 
     private static final String SQL_DELETE = "DELETE FROM Booking WHERE id = ?";
 
-    private BooksRepositoryImpl booksRepository;
-
-    private PersonsRepositoryImpl personsRepository;
 
     private final JdbcTemplate jdbcTemplate;
 
     private final RowMapper<Booking> toBooking = (row, column) -> Booking.builder()
             .id(row.getInt("id"))
-            .book(booksRepository.show(row.getInt("book_id")))
-            .person(personsRepository.show(row.getInt("person_id")))
+            .bookId(row.getInt("book_id"))
+            .personId(row.getInt("person_id"))
             .startTimeOfBooking(row.getDate("start_time_of_booking"))
             .finishTimeOfBooking(row.getDate("finish_time_of_booking"))
             .isFinished(row.getBoolean("is_finished"))
             .build();
 
     @Autowired
-    public BookingsRepositoryImpl(JdbcTemplate jdbcTemplate, BooksRepositoryImpl booksRepository, PersonsRepositoryImpl personsRepository) {
+    public BookingsRepositoryImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.booksRepository = booksRepository;
-        this.personsRepository = personsRepository;
     }
 
     @Override
@@ -61,7 +56,7 @@ public class BookingsRepositoryImpl implements BookingsRepository {
 
     @Override
     public boolean save(Booking booking) {
-        int result = jdbcTemplate.update(SQL_INSERT, booking.getBook().getId(), booking.getPerson().getId(), new Date(System.currentTimeMillis()), false);
+        int result = jdbcTemplate.update(SQL_INSERT, booking.getBookId(), booking.getPersonId(), new Date(System.currentTimeMillis()), false);
 
         return result == 1;
     }
@@ -77,7 +72,7 @@ public class BookingsRepositoryImpl implements BookingsRepository {
 
     @Override
     public boolean update(Integer id, Booking updatedBooking) {
-        int result = jdbcTemplate.update(SQL_UPDATE, updatedBooking.getBook().getId(), updatedBooking.getPerson().getId(), updatedBooking.getStartTimeOfBooking(), updatedBooking.getFinishTimeOfBooking(), updatedBooking.isFinished() ,updatedBooking.getId());
+        int result = jdbcTemplate.update(SQL_UPDATE, updatedBooking.getBookId(), updatedBooking.getPersonId(), updatedBooking.getStartTimeOfBooking(), updatedBooking.getFinishTimeOfBooking(), updatedBooking.isFinished() ,updatedBooking.getId());
 
         return result == 1;
     }
