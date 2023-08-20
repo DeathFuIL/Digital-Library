@@ -10,10 +10,10 @@
     <a th:href="@{/bookings}">Back</a>
     <hr>
     Person:
-    <a th:href="@{/persons/{id}(id=${booking.getPerson().getId()})}" th:text="${booking.getPerson().getFullName()}">person</a>
+    <a th:href="@{/persons/{id}(id=${booking.getPersonId()})}" th:text="${personsRepository.show(booking.getPersonId()).getFullName()}">person</a>
     <br>
     Book:
-    <a th:href="@{/books/{id}(id=${booking.getBook().getId()})}" th:text="${booking.getBook().getFullName()}">book</a>
+    <a th:href="@{/books/{id}(id=${booking.getBookId()})}" th:text="${booksRepository.show(booking.getBookId()).getFullName()}">book</a>
     <div th:switch="${booking.isFinished()}">
         <div th:case="${true}">
             <a th:text="${'Date: ' + booking.getStartTimeOfBooking() + ' - ' + booking.getFinishTimeOfBooking()}"></a>
