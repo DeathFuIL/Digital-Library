@@ -7,9 +7,15 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.rasim.models.Booking;
+import ru.rasim.models.Person;
 import ru.rasim.repositories.impl.BookingsRepositoryImpl;
+import ru.rasim.repositories.impl.BooksRepositoryImpl;
+import ru.rasim.repositories.impl.PersonsRepositoryImpl;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/bookings")
@@ -65,8 +71,19 @@ public class BookingsController {
     }
 
 
-    @GetMapping("/new")
-    public String newBooking(@ModelAttribute("booking")Booking booking) {
+    @GetMapping(value = {"/new", "/new/{id}"})
+    public String newBooking(@PathVariable(value = "id", required = false) Optional<Integer> id,
+                             @ModelAttribute("booking") Booking booking,
+                             Model model) {
+        List<Person> personsList;
+        if (id.isPresent()) {
+            personsList = new ArrayList<>(1);
+            personsList.add(personsRepository.show(id.get()));
+        } else {
+            personsList = personsRepository.showAll();
+        }
+        model.addAttribute("persons", personsList);
+        model.addAttribute("books", booksRepository.showAll());
         return "booking/new";
     }
 
