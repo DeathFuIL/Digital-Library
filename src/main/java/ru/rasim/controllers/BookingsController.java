@@ -17,9 +17,15 @@ public class BookingsController {
 
     private final BookingsRepositoryImpl bookingsRepository;
 
+    private final PersonsRepositoryImpl personsRepository;
+
+    private final BooksRepositoryImpl booksRepository;
+
     @Autowired
-    public BookingsController(BookingsRepositoryImpl bookingsRepository) {
+    public BookingsController(BookingsRepositoryImpl bookingsRepository, PersonsRepositoryImpl personsRepository, BooksRepositoryImpl booksRepository) {
         this.bookingsRepository = bookingsRepository;
+        this.personsRepository = personsRepository;
+        this.booksRepository = booksRepository;
     }
 
     @GetMapping()
