@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.rasim.models.Book;
 import ru.rasim.repositories.impl.BooksRepositoryImpl;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 
 @Controller

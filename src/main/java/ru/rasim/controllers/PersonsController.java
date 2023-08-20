@@ -11,7 +11,7 @@ import ru.rasim.repositories.impl.BookingsRepositoryImpl;
 import ru.rasim.repositories.impl.BooksRepositoryImpl;
 import ru.rasim.repositories.impl.PersonsRepositoryImpl;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 

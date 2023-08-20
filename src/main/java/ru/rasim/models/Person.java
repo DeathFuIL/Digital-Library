@@ -5,10 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +16,6 @@ import javax.validation.constraints.Size;
 @Builder
 public class Person {
 
-    @Min(value = 0, message = "Please, select person")
     private Integer id;
 
     @NotEmpty(message = "Name must not be empty")
@@ -27,7 +26,7 @@ public class Person {
     @Size(min = 2, message = "Surname must contain minimum 2 character")
     private String surname;
 
-    @Min(value = 0, message = "Age must be greater than 0")
+    @Min(value = 1, message = "Age must be greater or equals 1")
     private Integer age;
 
     @Email

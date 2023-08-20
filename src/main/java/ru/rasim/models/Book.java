@@ -1,12 +1,13 @@
 package ru.rasim.models;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 
 @Data
 @NoArgsConstructor
@@ -14,13 +15,13 @@ import javax.validation.constraints.NotEmpty;
 @Builder
 public class Book {
 
-    @Min(value = 0, message = "Please, select book")
     private Integer id;
 
     @NotEmpty(message = "Name must not be empty")
     private String name;
 
-    @Min(value = 0, message = "Age must be greater than 0")
+    @NotNull(message = "Please, enter the year of publishing")
+    @Min(value = 1, message = "Age must be greater or equals 1")
     private Integer year;
 
     @NotEmpty(message = "Author must not be empty")

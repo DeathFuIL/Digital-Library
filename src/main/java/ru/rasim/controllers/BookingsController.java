@@ -12,7 +12,7 @@ import ru.rasim.repositories.impl.BookingsRepositoryImpl;
 import ru.rasim.repositories.impl.BooksRepositoryImpl;
 import ru.rasim.repositories.impl.PersonsRepositoryImpl;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -89,9 +89,14 @@ public class BookingsController {
 
     @PostMapping()
     public String create(@ModelAttribute("booking") @Valid Booking booking,
-                         BindingResult bindingResult) {
-        if (bindingResult.hasErrors())
+                         BindingResult bindingResult,
+                         Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("persons", personsRepository.showAll());
+            model.addAttribute("books", booksRepository.showAll());
             return "booking/new";
+        }
 
         bookingsRepository.save(booking);
         return "redirect:/bookings";
