@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.rasim.models.Booking;
 import ru.rasim.models.Person;
 import ru.rasim.repositories.impl.BookingsRepositoryImpl;
+import ru.rasim.repositories.impl.BooksRepositoryImpl;
 import ru.rasim.repositories.impl.PersonsRepositoryImpl;
 
 import javax.validation.Valid;
@@ -23,11 +24,14 @@ public class PersonsController {
 
     private final BookingsRepositoryImpl bookingsRepository;
 
+    private final BooksRepositoryImpl booksRepository;
+
 
     @Autowired
-    public PersonsController(PersonsRepositoryImpl personsRepository, BookingsRepositoryImpl bookingsRepository) {
+    public PersonsController(PersonsRepositoryImpl personsRepository, BookingsRepositoryImpl bookingsRepository, BooksRepositoryImpl booksRepository) {
         this.personsRepository = personsRepository;
         this.bookingsRepository = bookingsRepository;
+        this.booksRepository = booksRepository;
     }
 
     @GetMapping()
@@ -39,6 +43,7 @@ public class PersonsController {
     @GetMapping("/{id}")
     public String show(@PathVariable("id") Integer id, Model model) {
         List<Booking> personBookings = bookingsRepository.showByPersonId(id);
+        model.addAttribute("booksRepository", booksRepository);
         model.addAttribute("personBookings", personBookings);
         model.addAttribute("person", personsRepository.show(id));
         return "person/show";
