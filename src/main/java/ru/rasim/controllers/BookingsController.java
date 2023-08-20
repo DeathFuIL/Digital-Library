@@ -30,6 +30,8 @@ public class BookingsController {
 
     @GetMapping()
     public String showAll(Model model) {
+        model.addAttribute("booksRepository", booksRepository);
+        model.addAttribute("personsRepository", personsRepository);
         model.addAttribute("bookings", bookingsRepository.showAll());
 
         return "booking/showAll";
@@ -37,6 +39,8 @@ public class BookingsController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") Integer id, Model model) {
+        model.addAttribute("booksRepository", booksRepository);
+        model.addAttribute("personsRepository", personsRepository);
         model.addAttribute("booking", bookingsRepository.show(id));
 
         return "booking/show";
@@ -44,6 +48,8 @@ public class BookingsController {
 
     @GetMapping("/active")
     public String showAllActive(Model model) {
+        model.addAttribute("booksRepository", booksRepository);
+        model.addAttribute("personsRepository", personsRepository);
         model.addAttribute("activeBookings", bookingsRepository.showAllActive());
 
         return "booking/active";
@@ -51,6 +57,8 @@ public class BookingsController {
 
     @GetMapping("/finished")
     public String showAllFinished(Model model) {
+        model.addAttribute("booksRepository", booksRepository);
+        model.addAttribute("personsRepository", personsRepository);
         model.addAttribute("finishedBookings", bookingsRepository.showAllFinished());
 
         return "booking/finished";
