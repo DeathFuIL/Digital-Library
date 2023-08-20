@@ -14,6 +14,7 @@ import javax.validation.constraints.NotEmpty;
 @Builder
 public class Book {
 
+    @Min(value = 0, message = "Please, select book")
     private Integer id;
 
     @NotEmpty(message = "Name must not be empty")
