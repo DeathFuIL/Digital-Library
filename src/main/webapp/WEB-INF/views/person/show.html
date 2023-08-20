@@ -16,7 +16,7 @@
     <p th:case="${true}">Человек пока не взял ни одной книги</p>
     <p th:case="${false}">
         <div th:each="personBooking : ${personBookings}">
-            <a th:href="@{/bookings/{id}(id=${personBooking.getId()})}" th:text="${personBooking.getBook().getFullName()}">book</a>
+            <a th:href="@{/bookings/{id}(id=${personBooking.getId()})}" th:text="${booksRepository.show(personBooking.getBookId()).getFullName()}">book</a>
         </div>
 </div>
 <hr>
