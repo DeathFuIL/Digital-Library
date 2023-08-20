@@ -20,6 +20,9 @@
         </div>
 </div>
 <hr>
+<form th:method="GET" th:action="@{/bookings/new/{id}(id=${person.getId()})}">
+    <input type="submit" value="New booking">
+</form>
 <form th:method="GET" th:action="@{/persons/{id}/edit(id=${person.getId()})}">
     <input type="submit" value="Edit"/>
 </form>
