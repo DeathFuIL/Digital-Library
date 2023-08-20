@@ -9,5 +9,22 @@
 <br>
 <a th:href="@{/bookings}">Back</a>
 <hr>
+<form th:method="POST" th:action="@{/bookings}" th:object="${booking}">
+    <label for="personId">Select person: </label>
+    <select th:object="${booking}" th:field="*{personId}" id="personId">
+        <option th:if="${persons.size() != 1}" value="null"></option>
+        <option th:each="person : ${persons}" th:value="${person.getId()}" th:text="${person.getFullName()}">person</option>
+    </select>
+    <div style="color:red" th:if="*{#fields.hasErrors('personId')}" th:errors="*{personId}">Id error</div>
+    <br>
+    <label for="bookId">Select book: </label>
+    <select th:object="${booking}" th:field="*{bookId}" id="bookId">
+        <option value="-1"></option>
+        <option th:each="book : ${books}" th:value="${book.getId()}" th:text="${book.getFullName()}">book</option>
+    </select>
+    <div style="color:red" th:if="*{#fields.hasErrors('bookId')}" th:errors="*{bookId}">Id error</div>
+    <br>
+    <input type="submit" value="Create!">
+</form>
 </body>
 </html>
