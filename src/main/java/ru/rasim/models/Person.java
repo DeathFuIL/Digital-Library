@@ -16,6 +16,7 @@ import javax.validation.constraints.Size;
 @Builder
 public class Person {
 
+    @Min(value = 0, message = "Please, select person")
     private Integer id;
 
     @NotEmpty(message = "Name must not be empty")
