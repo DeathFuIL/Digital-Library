@@ -12,7 +12,7 @@
 <form th:method="POST" th:action="@{/bookings}" th:object="${booking}">
     <label for="personId">Select person: </label>
     <select th:object="${booking}" th:field="*{personId}" id="personId">
-        <option th:if="${persons.size() != 1}" value="null"></option>
+        <option th:if="${persons.size() != 1}" value="-1"></option>
         <option th:each="person : ${persons}" th:value="${person.getId()}" th:text="${person.getFullName()}">person</option>
     </select>
     <div style="color:red" th:if="*{#fields.hasErrors('personId')}" th:errors="*{personId}">Id error</div>
