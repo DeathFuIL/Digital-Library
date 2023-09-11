@@ -73,10 +73,11 @@ public class PersonsRepositoryImpl implements PersonsRepository {
     }
 
     @Override
-    public boolean delete(Integer id) {
-        int result = jdbcTemplate.update(SQL_DELETE, id);
+    public boolean delete(Long id) {
+        Person person = show(id);
+        session.remove(person);
 
-        return result == 1;
+        return true;
     }
 
 }
