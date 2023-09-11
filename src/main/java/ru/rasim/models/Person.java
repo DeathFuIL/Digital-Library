@@ -20,7 +20,10 @@ import jakarta.validation.constraints.Size;
 @Table(name = "Person")
 public class Person {
 
-    private Integer id;
+    @Column(name = "id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @NotEmpty(message = "Name must not be empty")
     @Size(min = 2, message = "Name must contain minimum 2 character")
