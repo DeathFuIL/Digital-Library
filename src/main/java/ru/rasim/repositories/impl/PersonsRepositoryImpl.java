@@ -56,9 +56,8 @@ public class PersonsRepositoryImpl implements PersonsRepository {
     }
 
     @Override
-    public Person show(Integer id) {
-        return jdbcTemplate.query(SQL_SELECT, new BeanPropertyRowMapper<>(Person.class), id).stream()
-                .findAny().orElse(null);
+    public Person show(Long id) {
+        return session.get(Person.class, id);
     }
 
     @Override
