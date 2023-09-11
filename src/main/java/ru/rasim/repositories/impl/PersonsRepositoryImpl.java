@@ -1,10 +1,11 @@
 package ru.rasim.repositories.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import jakarta.annotation.PreDestroy;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.rasim.models.Person;
 import ru.rasim.repositories.PersonsRepository;
@@ -34,6 +35,12 @@ public class PersonsRepositoryImpl implements PersonsRepository {
             session = testSession;
             session.beginTransaction();
         }
+    }
+
+    @PreDestroy
+    public void closeSession() {
+        session.close();
+        System.out.println("\"Person\" table has been closed");
     }
 
     @Override
