@@ -49,10 +49,10 @@ public class PersonsRepositoryImpl implements PersonsRepository {
     }
 
     @Override
-    public boolean save(Person person) {
-        int result = jdbcTemplate.update(SQL_INSERT, person.getName(), person.getSurname(), person.getAge(), person.getEmail());
+    public Long save(Person person) {
+        session.save(person);
 
-        return result == 1;
+        return person.getId();
     }
 
     @Override
