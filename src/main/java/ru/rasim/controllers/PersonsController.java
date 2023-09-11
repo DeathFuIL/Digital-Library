@@ -64,8 +64,8 @@ public class PersonsController {
         if (bindingResult.hasErrors())
             return "person/new";
 
-        personsRepository.save(person);
-        return "redirect:/persons";
+        Long generatedId = personsRepository.save(person);
+        return "redirect:/persons/" + generatedId;
     }
 
     @GetMapping("/{id}/edit")
