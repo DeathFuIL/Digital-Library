@@ -42,10 +42,14 @@ public class PersonsController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") Long id, Model model) {
+        Person person = personsRepository.show(id);
+        if (person == null) {
+            return "person/error";
+        }
         List<Booking> personBookings = bookingsRepository.showByPersonId(id);
         model.addAttribute("booksRepository", booksRepository);
         model.addAttribute("personBookings", personBookings);
-        model.addAttribute("person", personsRepository.show(id));
+        model.addAttribute("person", person);
         return "person/show";
     }
 
