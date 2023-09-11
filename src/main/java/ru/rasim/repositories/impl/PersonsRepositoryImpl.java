@@ -45,7 +45,7 @@ public class PersonsRepositoryImpl implements PersonsRepository {
 
     @Override
     public List<Person> showAll() {
-        return jdbcTemplate.query(SQL_SELECT_ALL, new BeanPropertyRowMapper<>(Person.class));
+        return session.createQuery(String.format("SELECT p FROM %s p", TABLE_NAME), Person.class).list();
     }
 
     @Override
