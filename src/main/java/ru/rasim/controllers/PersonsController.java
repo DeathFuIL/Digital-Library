@@ -81,7 +81,7 @@ public class PersonsController {
             return "person/edit";
 
         personsRepository.update(id, person);
-        return "redirect:/persons";
+        return "redirect:/persons/" + id;
     }
 
     @DeleteMapping("/{id}")
