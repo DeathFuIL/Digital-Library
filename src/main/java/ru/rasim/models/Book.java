@@ -15,7 +15,7 @@ import jakarta.validation.constraints.NotEmpty;
 @Builder
 public class Book {
 
-    private Integer id;
+    private Long id;
 
     @NotEmpty(message = "Name must not be empty")
     private String name;

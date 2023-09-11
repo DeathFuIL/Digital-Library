@@ -55,36 +55,37 @@ public class BookingsRepositoryImpl implements BookingsRepository {
     }
 
     @Override
-    public boolean save(Booking booking) {
+    public Long save(Booking booking) {
         int result = jdbcTemplate.update(SQL_INSERT, booking.getBookId(), booking.getPersonId(), new Date(System.currentTimeMillis()), false);
 
-        return result == 1;
+        return 0L;
     }
 
     @Override
-    public Booking show(Integer id) {
+    public Booking show(Long id) {
         return jdbcTemplate.query(SQL_SELECT, toBooking, id).stream().findAny().orElse(null);
     }
 
-    public List<Booking> showByPersonId(Integer id) {
+    @Override
+    public List<Booking> showByPersonId(Long id) {
         return jdbcTemplate.query(SQL_SELECT_BY_PERSON_ID, toBooking, id);
     }
 
     @Override
-    public boolean update(Integer id, Booking updatedBooking) {
+    public boolean update(Long id, Booking updatedBooking) {
         int result = jdbcTemplate.update(SQL_UPDATE, updatedBooking.getBookId(), updatedBooking.getPersonId(), updatedBooking.getStartTimeOfBooking(), updatedBooking.getFinishTimeOfBooking(), updatedBooking.isFinished() ,updatedBooking.getId());
 
         return result == 1;
     }
 
     @Override
-    public boolean delete(Integer id) {
+    public boolean delete(Long id) {
         int result = jdbcTemplate.update(SQL_DELETE, id);
 
         return result == 1;
     }
 
-    public boolean finish(Integer id) {
+    public boolean finish(Long id) {
         Booking booking = show(id);
         booking.setFinished(true);
         booking.setFinishTimeOfBooking(new Date(System.currentTimeMillis()));

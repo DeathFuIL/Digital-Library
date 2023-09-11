@@ -41,7 +41,7 @@ public class PersonsController {
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable("id") Integer id, Model model) {
+    public String show(@PathVariable("id") Long id, Model model) {
         List<Booking> personBookings = bookingsRepository.showByPersonId(id);
         model.addAttribute("booksRepository", booksRepository);
         model.addAttribute("personBookings", personBookings);
@@ -65,14 +65,14 @@ public class PersonsController {
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(@PathVariable("id") Integer id, Model model) {
+    public String edit(@PathVariable("id") Long id, Model model) {
         model.addAttribute("person", personsRepository.show(id));
         return "person/edit";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("person") @Valid Person person, BindingResult bindingResult,
-                         @PathVariable("id") int id) {
+                         @PathVariable("id") Long id) {
         if (bindingResult.hasErrors())
             return "person/edit";
 
@@ -81,7 +81,7 @@ public class PersonsController {
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id) {
+    public String delete(@PathVariable("id") Long id) {
         personsRepository.delete(id);
         return "redirect:/persons";
     }

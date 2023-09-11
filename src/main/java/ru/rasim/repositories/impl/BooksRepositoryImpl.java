@@ -37,27 +37,27 @@ public class BooksRepositoryImpl implements BooksRepository {
     }
 
     @Override
-    public boolean save(Book book) {
+    public Long save(Book book) {
         int result = jdbcTemplate.update(SQL_INSERT, book.getName(), book.getAuthor(), book.getYear());
 
-        return result == 1;
+        return 0L;
     }
 
     @Override
-    public Book show(Integer id) {
+    public Book show(Long id) {
         return jdbcTemplate.query(SQL_SELECT, new BeanPropertyRowMapper<>(Book.class), id).stream()
                 .findAny().orElse(null);
     }
 
     @Override
-    public boolean update(Integer id, Book updatedBook) {
+    public boolean update(Long id, Book updatedBook) {
         int result = jdbcTemplate.update(SQL_UPDATE, updatedBook.getName(), updatedBook.getAuthor(), updatedBook.getYear());
 
         return result == 1;
     }
 
     @Override
-    public boolean delete(Integer id) {
+    public boolean delete(Long id) {
         int result = jdbcTemplate.update(SQL_DELETE, id);
 
         return result == 1;

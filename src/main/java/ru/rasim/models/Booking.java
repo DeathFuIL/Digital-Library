@@ -15,7 +15,7 @@ import java.sql.Date;
 
 public class Booking {
 
-    private Integer id;
+    private Long id;
 
     @Min(value = 1, message = "Please, select person")
     private Integer personId;
