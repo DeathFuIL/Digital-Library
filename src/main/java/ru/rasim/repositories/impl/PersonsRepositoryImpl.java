@@ -17,22 +17,23 @@ import java.util.List;
 public class PersonsRepositoryImpl implements PersonsRepository {
     
     private static final String TABLE_NAME = "Person";
-    
-    private static final String SQL_INSERT = "INSERT INTO Person(name, surname, age, email) VALUES(?, ?, ?, ?)";
 
-    private static final String SQL_SELECT_ALL = "SELECT * FROM Person";
+    private final Session session;
 
-    private static final String SQL_SELECT = "SELECT * FROM Person WHERE id = ?";
+    {
+        Session testSession = null;
+        try {
+            Configuration configuration = new Configuration().addAnnotatedClass(Person.class);
+            SessionFactory sessionFactory = configuration.buildSessionFactory();
 
-    private static final String SQL_UPDATE = "UPDATE Person SET name = ?, surname = ?, age = ?, email = ? WHERE id = ?";
-
-    private static final String SQL_DELETE = "DELETE FROM Person WHERE id = ?";
-
-    private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public PersonsRepositoryImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+            testSession = sessionFactory.getCurrentSession();
+            System.out.println("Connecting to \"Person\" table has been established");
+        } catch (HibernateException e) {
+            throw new RuntimeException("Connecting to \"Person\" table is failed");
+        } finally {
+            session = testSession;
+            session.beginTransaction();
+        }
     }
 
     @Override
