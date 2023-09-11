@@ -61,11 +61,15 @@ public class PersonsRepositoryImpl implements PersonsRepository {
     }
 
     @Override
-    public boolean update(Integer id, Person updatedPerson) {
-        int result =  jdbcTemplate.update(SQL_UPDATE, updatedPerson.getName(), updatedPerson.getSurname(),
-                updatedPerson.getAge(), updatedPerson.getEmail(), updatedPerson.getId() );
+    public boolean update(Long id, Person updatedPerson) {
+        Person originPerson = show(id);
 
-        return result == 1;
+        originPerson.setName(updatedPerson.getName());
+        originPerson.setSurname(updatedPerson.getSurname());
+        originPerson.setAge(updatedPerson.getAge());
+        originPerson.setEmail(updatedPerson.getEmail());
+
+        return true;
     }
 
     @Override
