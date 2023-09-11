@@ -36,7 +36,7 @@ public class BookingsRepositoryImpl implements BookingsRepository {
     private final JdbcTemplate jdbcTemplate;
 
     private final RowMapper<Booking> toBooking = (row, column) -> Booking.builder()
-            .id(row.getInt("id"))
+            .id(row.getLong("id"))
             .bookId(row.getInt("book_id"))
             .personId(row.getInt("person_id"))
             .startTimeOfBooking(row.getDate("start_time_of_booking"))
