@@ -33,6 +33,10 @@ public class Book {
     @NotEmpty(message = "Author must not be empty")
     private String author;
 
+    @Column(name = "count")
+    @PositiveOrZero(message = "The count of books cannot be less than 0")
+    private Integer count;
+
     public String getFullName() {
         return name + ", " + author + ", " + year;
     }
