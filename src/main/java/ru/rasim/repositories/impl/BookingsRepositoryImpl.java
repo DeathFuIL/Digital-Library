@@ -1,9 +1,10 @@
 package ru.rasim.repositories.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.PreDestroy;
+import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.rasim.models.Booking;
 import ru.rasim.repositories.BookingsRepository;
@@ -14,92 +15,105 @@ import java.util.List;
 
 @Component
 @Scope("singleton")
-public class BookingsRepositoryImpl implements BookingsRepository {
+public class BookingsRepositoryImpl extends CrudRepositoryImpl implements BookingsRepository {
+    
+    private static final Class<Booking> OBJECT_CLASS = Booking.class;
+    
+    private static final String TABLE_NAME = "Booking";
 
-    private static final String SQL_INSERT = "INSERT INTO Booking(book_id, person_id, start_time_of_booking, is_finished) VALUES(?, ?, ?, ?)";
+    private final SessionFactory sessionFactory;
 
-    private static final String SQL_SELECT_ALL = "SELECT * FROM Booking";
+    {
+        SessionFactory testSessionFactory = null;
+        try {
+            Configuration configuration = new Configuration().addAnnotatedClass(OBJECT_CLASS);
+            testSessionFactory = configuration.buildSessionFactory();
 
-    private static final String SQL_SELECT_ALL_ACTIVE = "SELECT * FROM Booking WHERE is_finished = false";
+            System.out.printf("Connecting to \"%s\" table has been established\n", TABLE_NAME);
+        } catch (HibernateException e) {
+            throw new RuntimeException(String.format("Connecting to \"%s\" table is failed", TABLE_NAME));
+        } finally {
+            sessionFactory = testSessionFactory;
+        }
+    }
 
-    private static final String SQL_SELECT_ALL_FINISHED = "SELECT * FROM Booking WHERE is_finished = true";
-
-    private static final String SQL_SELECT = "SELECT * FROM Booking WHERE id = ?";
-
-    private static final String SQL_SELECT_BY_PERSON_ID = "SELECT * FROM Booking WHERE person_id = ? AND is_finished = false";
-
-    private static final String SQL_UPDATE = "UPDATE Booking SET book_id = ?, person_id = ?, start_time_of_booking = ?, finish_time_of_booking = ?, is_finished = ? WHERE id = ?";
-
-    private static final String SQL_DELETE = "DELETE FROM Booking WHERE id = ?";
-
-
-    private final JdbcTemplate jdbcTemplate;
-
-    private final RowMapper<Booking> toBooking = (row, column) -> Booking.builder()
-            .id(row.getLong("id"))
-            .bookId(row.getInt("book_id"))
-            .personId(row.getInt("person_id"))
-            .startTimeOfBooking(row.getDate("start_time_of_booking"))
-            .finishTimeOfBooking(row.getDate("finish_time_of_booking"))
-            .isFinished(row.getBoolean("is_finished"))
-            .build();
-
-    @Autowired
-    public BookingsRepositoryImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    @PreDestroy
+    public void closeSession() {
+        sessionFactory.close();
+        System.out.printf("\"%s\" table has been closed\n", TABLE_NAME);
     }
 
     @Override
     public List<Booking> showAll() {
-        return jdbcTemplate.query(SQL_SELECT_ALL, toBooking);
+        return inTransactionWithResult(sessionFactory.getCurrentSession(),
+                session -> session.createQuery(String.format("SELECT o from %s o", TABLE_NAME), OBJECT_CLASS).list());
     }
 
     @Override
     public Long save(Booking booking) {
-        int result = jdbcTemplate.update(SQL_INSERT, booking.getBookId(), booking.getPersonId(), new Date(System.currentTimeMillis()), false);
+        booking.setStartTimeOfBooking(new Date(System.currentTimeMillis()));
 
-        return 0L;
+        inTransaction(sessionFactory.getCurrentSession(), session -> session.save(booking));
+
+        return booking.getId();
     }
 
     @Override
     public Booking show(Long id) {
-        return jdbcTemplate.query(SQL_SELECT, toBooking, id).stream().findAny().orElse(null);
+        return inTransactionWithResult(sessionFactory.getCurrentSession(), session -> session.get(OBJECT_CLASS, id));
     }
 
     @Override
     public List<Booking> showByPersonId(Long id) {
-        return jdbcTemplate.query(SQL_SELECT_BY_PERSON_ID, toBooking, id);
+       return inTransactionWithResult(sessionFactory.getCurrentSession(),
+               session -> session.createQuery(
+                       String.format("SELECT o FROM %s o WHERE personId = %d AND isFinished = false", TABLE_NAME, id),
+                       OBJECT_CLASS).list()
+       );
     }
 
     @Override
     public boolean update(Long id, Booking updatedBooking) {
-        int result = jdbcTemplate.update(SQL_UPDATE, updatedBooking.getBookId(), updatedBooking.getPersonId(), updatedBooking.getStartTimeOfBooking(), updatedBooking.getFinishTimeOfBooking(), updatedBooking.isFinished() ,updatedBooking.getId());
+        inTransaction(sessionFactory.getCurrentSession(), session -> {
+            updatedBooking.setId(id);
+            session.merge(updatedBooking);
+        });
 
-        return result == 1;
+        return true;
     }
 
     @Override
     public boolean delete(Long id) {
-        int result = jdbcTemplate.update(SQL_DELETE, id);
+        Booking booking = show(id);
 
-        return result == 1;
+        inTransaction(sessionFactory.getCurrentSession(), session -> {
+            session.remove(booking);
+        });
+
+        return true;
     }
 
     public boolean finish(Long id) {
-        Booking booking = show(id);
-        booking.setFinished(true);
-        booking.setFinishTimeOfBooking(new Date(System.currentTimeMillis()));
-        boolean result = update(id, booking);
+        inTransaction(sessionFactory.getCurrentSession(), session -> {
+            Booking booking = session.get(OBJECT_CLASS, id);
+            booking.setFinished(true);
+            booking.setFinishTimeOfBooking(new Date(System.currentTimeMillis()));
+        });
 
-        return result;
+        return true;
     }
 
     public List<Booking> showAllFinished() {
-        return jdbcTemplate.query(SQL_SELECT_ALL_FINISHED, toBooking);
+        return inTransactionWithResult(sessionFactory.getCurrentSession(),
+                session -> session.createQuery(
+                        String.format("SELECT o FROM %s o WHERE isFinished = true", TABLE_NAME), OBJECT_CLASS).list()
+        );
     }
 
     public List<Booking> showAllActive() {
-        return jdbcTemplate.query(SQL_SELECT_ALL_ACTIVE, toBooking);
+        return inTransactionWithResult(sessionFactory.getCurrentSession(),
+                session -> session.createQuery(
+                        String.format("SELECT o FROM %s o WHERE isFinished = false", TABLE_NAME), OBJECT_CLASS).list()
+        );
     }
-
 }
