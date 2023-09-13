@@ -44,7 +44,7 @@ public class BookingsController {
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable("id") Integer id, Model model) {
+    public String show(@PathVariable("id") Long id, Model model) {
         model.addAttribute("booksRepository", booksRepository);
         model.addAttribute("personsRepository", personsRepository);
         model.addAttribute("booking", bookingsRepository.show(id));
@@ -72,7 +72,7 @@ public class BookingsController {
 
 
     @GetMapping(value = {"/new", "/new/{id}"})
-    public String newBooking(@PathVariable(value = "id", required = false) Optional<Integer> id,
+    public String newBooking(@PathVariable(value = "id", required = false) Optional<Long> id,
                              @ModelAttribute("booking") Booking booking,
                              Model model) {
         List<Person> personsList;
@@ -98,19 +98,19 @@ public class BookingsController {
             return "booking/new";
         }
 
-        bookingsRepository.save(booking);
-        return "redirect:/bookings";
+        Long generatedId = bookingsRepository.save(booking);
+        return "redirect:/bookings/" + generatedId;
     }
 
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id) {
+    public String delete(@PathVariable("id") Long id) {
         bookingsRepository.delete(id);
         return "redirect:/bookings";
     }
 
     @PatchMapping("/{id}")
-    public String finish(@PathVariable("id") int id) {
+    public String finish(@PathVariable("id") Long id) {
         bookingsRepository.finish(id);
         return "redirect:/bookings/" + id;
     }

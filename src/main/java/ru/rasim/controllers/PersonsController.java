@@ -41,11 +41,15 @@ public class PersonsController {
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable("id") Integer id, Model model) {
+    public String show(@PathVariable("id") Long id, Model model) {
+        Person person = personsRepository.show(id);
+        if (person == null) {
+            return "person/error";
+        }
         List<Booking> personBookings = bookingsRepository.showByPersonId(id);
         model.addAttribute("booksRepository", booksRepository);
         model.addAttribute("personBookings", personBookings);
-        model.addAttribute("person", personsRepository.show(id));
+        model.addAttribute("person", person);
         return "person/show";
     }
 
@@ -60,28 +64,28 @@ public class PersonsController {
         if (bindingResult.hasErrors())
             return "person/new";
 
-        personsRepository.save(person);
-        return "redirect:/persons";
+        Long generatedId = personsRepository.save(person);
+        return "redirect:/persons/" + generatedId;
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(@PathVariable("id") Integer id, Model model) {
+    public String edit(@PathVariable("id") Long id, Model model) {
         model.addAttribute("person", personsRepository.show(id));
         return "person/edit";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("person") @Valid Person person, BindingResult bindingResult,
-                         @PathVariable("id") int id) {
+                         @PathVariable("id") Long id) {
         if (bindingResult.hasErrors())
             return "person/edit";
 
         personsRepository.update(id, person);
-        return "redirect:/persons";
+        return "redirect:/persons/" + id;
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id) {
+    public String delete(@PathVariable("id") Long id) {
         personsRepository.delete(id);
         return "redirect:/persons";
     }

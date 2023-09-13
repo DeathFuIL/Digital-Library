@@ -22,6 +22,10 @@
   <input type="text" th:field="*{author}" id="author"/>
   <div style="color:red" th:if="${#fields.hasErrors('author')}" th:errors="*{author}">Author Error</div>
   <br/>
+  <label for="count">Enter count: </label>
+  <input type="text" th:field="*{count}" id="count">
+  <div style="color:red" th:if="${#fields.hasErrors('count')}" th:errors="*{count}">Count Error</div>
+  <br/>
   <input type="submit" value="Update!"/>
 </form>
 </body>

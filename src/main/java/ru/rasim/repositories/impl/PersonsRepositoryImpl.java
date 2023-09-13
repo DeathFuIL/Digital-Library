@@ -1,10 +1,10 @@
 package ru.rasim.repositories.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import jakarta.annotation.PreDestroy;
+import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.rasim.models.Person;
 import ru.rasim.repositories.PersonsRepository;
@@ -14,58 +14,70 @@ import java.util.List;
 
 @Component
 @Scope("singleton")
-public class PersonsRepositoryImpl implements PersonsRepository {
+public class PersonsRepositoryImpl extends CrudRepositoryImpl implements PersonsRepository {
+    
+    private static final Class<Person> OBJECT_CLASS = Person.class;
     
     private static final String TABLE_NAME = "Person";
-    
-    private static final String SQL_INSERT = "INSERT INTO Person(name, surname, age, email) VALUES(?, ?, ?, ?)";
 
-    private static final String SQL_SELECT_ALL = "SELECT * FROM Person";
+    private final SessionFactory sessionFactory;
 
-    private static final String SQL_SELECT = "SELECT * FROM Person WHERE id = ?";
+    {
+        SessionFactory testSessionFactory = null;
+        try {
+            Configuration configuration = new Configuration().addAnnotatedClass(OBJECT_CLASS);
+            testSessionFactory = configuration.buildSessionFactory();
 
-    private static final String SQL_UPDATE = "UPDATE Person SET name = ?, surname = ?, age = ?, email = ? WHERE id = ?";
+            System.out.printf("Connecting to \"%s\" table has been established\n", TABLE_NAME);
+        } catch (HibernateException e) {
+            throw new RuntimeException(String.format("Connecting to \"%s\" table is failed", TABLE_NAME));
+        } finally {
+            sessionFactory = testSessionFactory;
+        }
+    }
 
-    private static final String SQL_DELETE = "DELETE FROM Person WHERE id = ?";
-
-    private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public PersonsRepositoryImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    @PreDestroy
+    public void closeSession() {
+        sessionFactory.close();
+        System.out.printf("\"%s\" table has been closed\n", TABLE_NAME);
     }
 
     @Override
     public List<Person> showAll() {
-        return jdbcTemplate.query(SQL_SELECT_ALL, new BeanPropertyRowMapper<>(Person.class));
+        return inTransactionWithResult(sessionFactory.getCurrentSession(),
+                session -> session.createQuery(String.format("SELECT o FROM %s o", TABLE_NAME), OBJECT_CLASS).list());
     }
 
     @Override
-    public boolean save(Person person) {
-        int result = jdbcTemplate.update(SQL_INSERT, person.getName(), person.getSurname(), person.getAge(), person.getEmail());
+    public Long save(Person person) {
+        inTransaction(sessionFactory.getCurrentSession(), session -> session.save(person));
 
-        return result == 1;
+        return person.getId();
     }
 
     @Override
-    public Person show(Integer id) {
-        return jdbcTemplate.query(SQL_SELECT, new BeanPropertyRowMapper<>(Person.class), id).stream()
-                .findAny().orElse(null);
+    public Person show(Long id) {
+        return inTransactionWithResult(sessionFactory.getCurrentSession(), session -> session.get(OBJECT_CLASS, id));
     }
 
     @Override
-    public boolean update(Integer id, Person updatedPerson) {
-        int result =  jdbcTemplate.update(SQL_UPDATE, updatedPerson.getName(), updatedPerson.getSurname(),
-                updatedPerson.getAge(), updatedPerson.getEmail(), updatedPerson.getId() );
+    public boolean update(Long id, Person updatedPerson) {
+        inTransaction(sessionFactory.getCurrentSession(), session -> {
+            updatedPerson.setId(id);
+            session.merge(updatedPerson);
+        });
 
-        return result == 1;
+        return true;
     }
 
     @Override
-    public boolean delete(Integer id) {
-        int result = jdbcTemplate.update(SQL_DELETE, id);
+    public boolean delete(Long id) {
+        inTransaction(sessionFactory.getCurrentSession(), session -> {
+            Person person = session.get(OBJECT_CLASS ,id);
+            session.remove(person);
+        });
 
-        return result == 1;
+        return true;
     }
 
 }
