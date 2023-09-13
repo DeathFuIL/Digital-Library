@@ -98,8 +98,8 @@ public class BookingsController {
             return "booking/new";
         }
 
-        bookingsRepository.save(booking);
-        return "redirect:/bookings";
+        Long generatedId = bookingsRepository.save(booking);
+        return "redirect:/bookings/" + generatedId;
     }
 
 
