@@ -4,6 +4,7 @@ import jakarta.annotation.PreDestroy;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ru.rasim.models.Book;
@@ -13,11 +14,13 @@ import java.util.List;
 
 @Component
 @Scope("singleton")
-public class BooksRepositoryImpl extends CrudRepositoryImpl implements BooksRepository {
+public class BooksRepositoryImpl extends AbstractCrudRepositoryImpl implements BooksRepository {
 
     private static final Class<Book> OBJECT_CLASS = Book.class;
 
     private static final String TABLE_NAME = "Book";
+
+    private final BookingsRepositoryImpl bookingsRepository;
 
     private final SessionFactory sessionFactory;
 
@@ -33,6 +36,11 @@ public class BooksRepositoryImpl extends CrudRepositoryImpl implements BooksRepo
         } finally {
             sessionFactory = testSessionFactory;
         }
+    }
+
+    @Autowired
+    public BooksRepositoryImpl(BookingsRepositoryImpl bookingsRepository) {
+        this.bookingsRepository = bookingsRepository;
     }
 
     @PreDestroy
@@ -77,6 +85,20 @@ public class BooksRepositoryImpl extends CrudRepositoryImpl implements BooksRepo
         });
 
         return true;
+    }
+
+     public Integer getNumberOfFreeBooks(Long bookId) {
+        int totalNumberOfBooks = inTransactionWithResult(sessionFactory.getCurrentSession(),
+                session -> session.get(OBJECT_CLASS, bookId)).getCount();
+
+        int numberOfTakenBooks = bookingsRepository.showByBookId(bookId).size();
+
+        return totalNumberOfBooks - numberOfTakenBooks;
+
+    }
+
+    public boolean isFreeBookExisting(Long bookId) {
+        return getNumberOfFreeBooks(bookId) > 0;
     }
 
 }
