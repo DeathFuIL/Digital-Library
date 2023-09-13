@@ -2,7 +2,6 @@ package ru.rasim.repositories.impl;
 
 import jakarta.annotation.PreDestroy;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -15,67 +14,68 @@ import java.util.List;
 
 @Component
 @Scope("singleton")
-public class PersonsRepositoryImpl implements PersonsRepository {
+public class PersonsRepositoryImpl extends CrudRepositoryImpl implements PersonsRepository {
+    
+    private static final Class<Person> OBJECT_CLASS = Person.class;
     
     private static final String TABLE_NAME = "Person";
 
-    private final Session session;
+    private final SessionFactory sessionFactory;
 
     {
-        Session testSession = null;
+        SessionFactory testSessionFactory = null;
         try {
-            Configuration configuration = new Configuration().addAnnotatedClass(Person.class);
-            SessionFactory sessionFactory = configuration.buildSessionFactory();
+            Configuration configuration = new Configuration().addAnnotatedClass(OBJECT_CLASS);
+            testSessionFactory = configuration.buildSessionFactory();
 
-            testSession = sessionFactory.getCurrentSession();
-            System.out.println("Connecting to \"Person\" table has been established");
+            System.out.printf("Connecting to \"%s\" table has been established\n", TABLE_NAME);
         } catch (HibernateException e) {
-            throw new RuntimeException("Connecting to \"Person\" table is failed");
+            throw new RuntimeException(String.format("Connecting to \"%s\" table is failed", TABLE_NAME));
         } finally {
-            session = testSession;
-            session.beginTransaction();
+            sessionFactory = testSessionFactory;
         }
     }
 
     @PreDestroy
     public void closeSession() {
-        session.close();
-        System.out.println("\"Person\" table has been closed");
+        sessionFactory.close();
+        System.out.printf("\"%s\" table has been closed\n", TABLE_NAME);
     }
 
     @Override
     public List<Person> showAll() {
-        return session.createQuery(String.format("SELECT p FROM %s p", TABLE_NAME), Person.class).list();
+        return inTransactionWithResult(sessionFactory.getCurrentSession(),
+                session -> session.createQuery(String.format("SELECT o FROM %s o", TABLE_NAME), OBJECT_CLASS).list());
     }
 
     @Override
     public Long save(Person person) {
-        session.save(person);
+        inTransaction(sessionFactory.getCurrentSession(), session -> session.save(person));
 
         return person.getId();
     }
 
     @Override
     public Person show(Long id) {
-        return session.get(Person.class, id);
+        return inTransactionWithResult(sessionFactory.getCurrentSession(), session -> session.get(OBJECT_CLASS, id));
     }
 
     @Override
     public boolean update(Long id, Person updatedPerson) {
-        Person originPerson = show(id);
-
-        originPerson.setName(updatedPerson.getName());
-        originPerson.setSurname(updatedPerson.getSurname());
-        originPerson.setAge(updatedPerson.getAge());
-        originPerson.setEmail(updatedPerson.getEmail());
+        inTransaction(sessionFactory.getCurrentSession(), session -> {
+            updatedPerson.setId(id);
+            session.merge(updatedPerson);
+        });
 
         return true;
     }
 
     @Override
     public boolean delete(Long id) {
-        Person person = show(id);
-        session.remove(person);
+        inTransaction(sessionFactory.getCurrentSession(), session -> {
+            Person person = session.get(OBJECT_CLASS ,id);
+            session.remove(person);
+        });
 
         return true;
     }
