@@ -15,7 +15,7 @@ import java.util.List;
 
 @Component
 @Scope("singleton")
-public class BookingsRepositoryImpl extends CrudRepositoryImpl implements BookingsRepository {
+public class BookingsRepositoryImpl extends AbstractCrudRepositoryImpl implements BookingsRepository {
     
     private static final Class<Booking> OBJECT_CLASS = Booking.class;
     
@@ -70,6 +70,14 @@ public class BookingsRepositoryImpl extends CrudRepositoryImpl implements Bookin
                        String.format("SELECT o FROM %s o WHERE personId = %d AND isFinished = false", TABLE_NAME, id),
                        OBJECT_CLASS).list()
        );
+    }
+
+    public List<Booking> showByBookId(Long bookId) {
+        return inTransactionWithResult(sessionFactory.getCurrentSession(),
+                session -> session.createQuery(
+                        String.format("SELECT o FROM %s o WHERE bookId = %d AND isFinished = false", TABLE_NAME, bookId),
+                        OBJECT_CLASS).list()
+        );
     }
 
     @Override

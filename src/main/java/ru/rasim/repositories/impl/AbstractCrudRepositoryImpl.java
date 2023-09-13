@@ -4,7 +4,7 @@ import org.hibernate.Session;
 import ru.rasim.functionalinterfaces.TransactionScope;
 import ru.rasim.functionalinterfaces.TransactionScopeWithResult;
 
-public abstract class CrudRepositoryImpl {
+public abstract class AbstractCrudRepositoryImpl {
     protected void inTransaction(Session session, TransactionScope transactionScope) {
         session.beginTransaction();
 
