@@ -14,7 +14,7 @@ import java.util.List;
 
 @Component
 @Scope("singleton")
-public class PersonsRepositoryImpl extends CrudRepositoryImpl implements PersonsRepository {
+public class PersonsRepositoryImpl extends AbstractCrudRepositoryImpl implements PersonsRepository {
     
     private static final Class<Person> OBJECT_CLASS = Person.class;
     
