@@ -64,5 +64,4 @@ public class Config implements WebMvcConfigurer {
 
         registry.viewResolver(resolver);
     }
-    
 }
